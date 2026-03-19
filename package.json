@@ -1,0 +1,22 @@
+{
+  "name": "rastreamento_entregas_pweb2_bsi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuizRoberto18/rastreamento_entregas_pweb2_bsi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LuizRoberto18/rastreamento_entregas_pweb2_bsi/issues"
+  },
+  "homepage": "https://github.com/LuizRoberto18/rastreamento_entregas_pweb2_bsi#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
