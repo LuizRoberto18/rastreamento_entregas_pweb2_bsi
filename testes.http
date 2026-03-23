@@ -1,0 +1,80 @@
+@baseUrl = http://localhost:3000/api/entregas
+
+### 🔹 1. Criar entrega (válida)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Notebook Dell",
+  "origem": "Maceió",
+  "destino": "Recife"
+}
+
+### 🔹 2. Criar outra entrega
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Smartphone Samsung",
+  "origem": "São Paulo",
+  "destino": "Rio de Janeiro"
+}
+
+### 🔹 3. Tentar criar entrega duplicada (erro esperado)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Notebook Dell",
+  "origem": "Maceió",
+  "destino": "Recife"
+}
+
+### 🔹 4. Listar todas as entregas
+GET {{baseUrl}}
+
+### 🔹 5. Buscar entrega por ID
+GET {{baseUrl}}/1
+
+### 🔹 6. Buscar entrega inexistente (erro)
+GET {{baseUrl}}/999
+
+### 🔹 7. Avançar status (CRIADA → EM_TRANSITO)
+PATCH {{baseUrl}}/1/avancar
+
+### 🔹 8. Avançar status (EM_TRANSITO → ENTREGUE)
+PATCH {{baseUrl}}/1/avancar
+
+### 🔹 9. Tentar avançar após ENTREGUE (erro)
+PATCH {{baseUrl}}/1/avancar
+
+### 🔹 10. Tentar cancelar entrega finalizada (erro)
+PATCH {{baseUrl}}/1/cancelar
+
+### 🔹 11. Cancelar entrega válida (ID 2)
+PATCH {{baseUrl}}/2/cancelar
+
+### 🔹 12. Tentar cancelar novamente (erro)
+PATCH {{baseUrl}}/2/cancelar
+
+### 🔹 13. Consultar histórico da entrega 1
+GET {{baseUrl}}/1/historico
+
+### 🔹 14. Consultar histórico da entrega 2
+GET {{baseUrl}}/2/historico
+
+### 🔹 15. Filtrar entregas por status (ENTREGUE)
+GET {{baseUrl}}?status=ENTREGUE
+
+### 🔹 16. Filtrar entregas por status (CANCELADA)
+GET {{baseUrl}}?status=CANCELADA
+
+### 🔹 17. Criar entrega inválida (origem = destino)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Teste inválido",
+  "origem": "Maceió",
+  "destino": "Maceió"
+}

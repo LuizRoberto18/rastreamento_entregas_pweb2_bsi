@@ -1,20 +1,27 @@
-import { Database } from "../database/database";
-
-const dataBase = new Database();
-
 export class EntregasRepository {
+    constructor(database) {
+        this.db = database;
+    }
 
     async listarTodos() {
-        return dataBase.getEntregas();
+        return this.db.getEntregas();
     }
     async buscarPorId(id) {
-        return dataBase.getEntregas();
+        return this.db.getEntregas().find(entrega => entrega.id === id);
     }
-    async criar(dados) {
-        const novaEntrega = { id: dataBase.nextId++, ...dados };
-        dataBase.entregas.push(novaEntrega);
-        return novaEntrega;
+    async criar(entrega) {
+        this.db.entregas.push(entrega);
+        return entrega;
     }
 
-    async atualizar(id, { }) { }
+    async atualizar(id, dadosAtualizados) {
+        const entregas = this.db.getEntregas();
+        const index = entregas.findIndex(e => e.id === id);
+        if (index === -1) {
+            return null;
+        }
+
+        entregas[index] = { ...entregas[index], ...dadosAtualizados };
+        return entregas[index];
+    }
 }
