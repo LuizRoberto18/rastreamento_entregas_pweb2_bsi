@@ -1,16 +1,37 @@
+/** @typedef {Object} IEntregasRepository */
+
+/** @implements {IEntregasRepository} */
 export class EntregasRepository {
     constructor(database) {
         this.db = database;
     }
 
-    async listarTodos() {
-        return this.db.getEntregas();
+    async listarTodos(filtros = {}) {
+        let entregas = this.db.getEntregas();
+
+        if (filtros.status) {
+            entregas = entregas.filter(entrega => entrega.status === filtros.status);
+        }
+
+        if (typeof filtros.motoristaId === "number") {
+            entregas = entregas.filter(entrega => entrega.motoristaId === filtros.motoristaId);
+        }
+
+        return entregas;
     }
+
     async buscarPorId(id) {
         return this.db.getEntregas().find(entrega => entrega.id === id);
     }
-    async criar(entrega) {
+
+    async criar(dados) {
+        const entrega = {
+            ...dados,
+            id: this.db.generateId()
+        };
+
         this.db.entregas.push(entrega);
+
         return entrega;
     }
 

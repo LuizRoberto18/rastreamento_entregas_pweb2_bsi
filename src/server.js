@@ -1,5 +1,5 @@
 import express from "express";
-import EntregasRoutes from "./routes/EntregasRoutes.js";
+import { createApiRouter } from "./routes/index.js";
 import { AppError } from "./utils/AppError.js";
 
 const app = express();
@@ -9,14 +9,14 @@ const PORT = 3000;
 app.use(express.json());
 
 // Rotas principais
-app.use("/api/entregas", EntregasRoutes);
+app.use("/api", createApiRouter());
 
 // Rota de health check (boa prática)
 app.get("/", (req, res) => {
     res.send("API de Rastreamento de Entregas está rodando 🚀");
 });
 
-// Middleware de erro (opcional, mas recomendado)
+// Middleware de erro 
 app.use((err, req, res, next) => {
     if (err instanceof AppError) {
         return res.status(err.statusCode).json({

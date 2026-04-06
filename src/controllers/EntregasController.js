@@ -60,4 +60,14 @@ export class EntregasController {
         }
     }
 
+    atribuirMotorista = async (req, res, next) => {
+        try {
+            const { motoristaId } = req.body;
+            const result = await this.service.atribuirMotorista(req.params.id, motoristaId);
+            res.json(result);
+        } catch (err) {
+            next(err);
+        }
+    }
+
 }

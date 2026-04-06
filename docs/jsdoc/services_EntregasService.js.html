@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/EntregasService.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/EntregasService.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { AppError } from "../utils/AppError.js";
+
+const STATUS = {
+  CRIADA: "CRIADA",
+  EM_TRANSITO: "EM_TRANSITO",
+  ENTREGUE: "ENTREGUE",
+  CANCELADA: "CANCELADA"
+};
+
+const STATUS_MOTORISTA = {
+  ATIVO: "ATIVO",
+  INATIVO: "INATIVO"
+};
+
+export class EntregasService {
+  /**
+    * @param {IEntregasRepository} entregasRepository
+    * @param {IMotoristasRepository} motoristasRepository
+   */
+  constructor(entregasRepository, motoristasRepository) {
+    this.entregasRepository = entregasRepository;
+    this.motoristasRepository = motoristasRepository;
+  }
+
+  async criarEntrega({ descricao, origem, destino }) {
+    if (origem === destino) {
+      throw new AppError("Origem e destino não podem ser iguais", 400);
+    }
+
+    const entregas = await this.entregasRepository.listarTodos();
+
+    const duplicada = entregas.find(e =>
+      e.descricao === descricao &amp;&amp;
+      e.origem === origem &amp;&amp;
+      e.destino === destino &amp;&amp;
+      ![STATUS.ENTREGUE, STATUS.CANCELADA].includes(e.status)
+    );
+
+    if (duplicada) {
+      throw new AppError("Entrega duplicada ativa", 400);
+    }
+
+    const novaEntrega = {
+      descricao,
+      origem,
+      destino,
+      status: STATUS.CRIADA,
+      motoristaId: null,
+      historico: [
+        {
+          data: new Date().toISOString(),
+          descricao: "Entrega criada"
+        }
+      ]
+    };
+
+    return await this.entregasRepository.criar(novaEntrega);
+  }
+
+  async listarEntregas(filtros) {
+    if (typeof filtros === "string") {
+      return this.entregasRepository.listarTodos({ status: filtros });
+    }
+
+    return this.entregasRepository.listarTodos(filtros || {});
+  }
+
+  async listarEntregasPorMotorista(motoristaId, status) {
+    const motoristaIdNumber = Number(motoristaId);
+    const filtros = { motoristaId: motoristaIdNumber };
+
+    if (status) {
+      filtros.status = status;
+    }
+
+    return this.entregasRepository.listarTodos(filtros);
+  }
+
+  async buscarPorId(id) {
+    const entrega = await this.entregasRepository.buscarPorId(Number(id));
+
+    if (!entrega) {
+      throw new AppError("Entrega não encontrada", 404);
+    }
+
+    return entrega;
+  }
+
+  async avancarEntrega(id) {
+    const entrega = await this.buscarPorId(id);
+
+    if ([STATUS.ENTREGUE, STATUS.CANCELADA].includes(entrega.status)) {
+      throw new AppError("Entrega já finalizada", 400);
+    }
+
+    if (entrega.status === STATUS.CRIADA) {
+      entrega.status = STATUS.EM_TRANSITO;
+      entrega.historico.push({
+        data: new Date().toISOString(),
+        descricao: "Saiu para entrega"
+      });
+    } else if (entrega.status === STATUS.EM_TRANSITO) {
+      entrega.status = STATUS.ENTREGUE;
+      entrega.historico.push({
+        data: new Date().toISOString(),
+        descricao: "Entrega finalizada"
+      });
+    } else {
+      throw new AppError("Transição inválida", 400);
+    }
+
+    return await this.entregasRepository.atualizar(entrega.id, entrega);
+  }
+
+  async cancelarEntrega(id) {
+    const entrega = await this.buscarPorId(id);
+
+    if (entrega.status === STATUS.ENTREGUE) {
+      throw new AppError("Não é possível cancelar entrega finalizada", 400);
+    }
+
+    if (entrega.status === STATUS.CANCELADA) {
+      throw new AppError("Entrega já cancelada", 400);
+    }
+
+    entrega.status = STATUS.CANCELADA;
+    entrega.historico.push({
+      data: new Date().toISOString(),
+      descricao: "Entrega cancelada"
+    });
+
+    return await this.entregasRepository.atualizar(entrega.id, entrega);
+  }
+
+  async obterHistorico(id) {
+    const entrega = await this.buscarPorId(id);
+    return entrega.historico;
+  }
+
+  async atribuirMotorista(id, motoristaId) {
+    const entrega = await this.buscarPorId(id);
+
+    if (entrega.status !== STATUS.CRIADA) {
+      throw new AppError("Apenas entregas com status CRIADA podem receber motorista", 422);
+    }
+
+    const motorista = await this.motoristasRepository.buscarPorId(Number(motoristaId));
+
+    if (!motorista) {
+      throw new AppError("Motorista não encontrado", 404);
+    }
+
+    if (motorista.status !== STATUS_MOTORISTA.ATIVO) {
+      throw new AppError("Não é permitido atribuir motorista INATIVO", 422);
+    }
+
+    const substituiu = typeof entrega.motoristaId === "number" &amp;&amp; entrega.motoristaId !== motorista.id;
+
+    entrega.motoristaId = motorista.id;
+    entrega.historico.push({
+      data: new Date().toISOString(),
+      descricao: substituiu
+        ? `Motorista substituído para ${motorista.nome}`
+        : `Motorista atribuído: ${motorista.nome}`
+    });
+
+    return this.entregasRepository.atualizar(entrega.id, entrega);
+  }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="EntregasRepository.html">EntregasRepository</a></li><li><a href="EntregasService_EntregasService.html">EntregasService</a></li><li><a href="MotoristasRepository.html">MotoristasRepository</a></li><li><a href="MotoristasService_MotoristasService.html">MotoristasService</a></li></ul><h3>Interfaces</h3><ul><li><a href="global.html#IEntregasRepository">IEntregasRepository</a></li><li><a href="global.html#IMotoristasRepository">IMotoristasRepository</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Mon Apr 06 2026 16:34:12 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

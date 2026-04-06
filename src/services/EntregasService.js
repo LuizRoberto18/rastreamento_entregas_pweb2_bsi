@@ -7,9 +7,19 @@ const STATUS = {
   CANCELADA: "CANCELADA"
 };
 
+const STATUS_MOTORISTA = {
+  ATIVO: "ATIVO",
+  INATIVO: "INATIVO"
+};
+
 export class EntregasService {
-  constructor(repository) {
-    this.repository = repository;
+  /**
+    * @param {IEntregasRepository} entregasRepository
+    * @param {IMotoristasRepository} motoristasRepository
+   */
+  constructor(entregasRepository, motoristasRepository) {
+    this.entregasRepository = entregasRepository;
+    this.motoristasRepository = motoristasRepository;
   }
 
   async criarEntrega({ descricao, origem, destino }) {
@@ -17,7 +27,7 @@ export class EntregasService {
       throw new AppError("Origem e destino não podem ser iguais", 400);
     }
 
-    const entregas = await this.repository.listarTodos();
+    const entregas = await this.entregasRepository.listarTodos();
 
     const duplicada = entregas.find(e =>
       e.descricao === descricao &&
@@ -31,11 +41,11 @@ export class EntregasService {
     }
 
     const novaEntrega = {
-      id: this.repository.db.generateId(),
       descricao,
       origem,
       destino,
       status: STATUS.CRIADA,
+      motoristaId: null,
       historico: [
         {
           data: new Date().toISOString(),
@@ -44,21 +54,30 @@ export class EntregasService {
       ]
     };
 
-    return await this.repository.criar(novaEntrega);
+    return await this.entregasRepository.criar(novaEntrega);
   }
 
-  async listarEntregas(status) {
-    const entregas = await this.repository.listarTodos();
-
-    if (status) {
-      return entregas.filter(e => e.status === status);
+  async listarEntregas(filtros) {
+    if (typeof filtros === "string") {
+      return this.entregasRepository.listarTodos({ status: filtros });
     }
 
-    return entregas;
+    return this.entregasRepository.listarTodos(filtros || {});
+  }
+
+  async listarEntregasPorMotorista(motoristaId, status) {
+    const motoristaIdNumber = Number(motoristaId);
+    const filtros = { motoristaId: motoristaIdNumber };
+
+    if (status) {
+      filtros.status = status;
+    }
+
+    return this.entregasRepository.listarTodos(filtros);
   }
 
   async buscarPorId(id) {
-    const entrega = await this.repository.buscarPorId(Number(id));
+    const entrega = await this.entregasRepository.buscarPorId(Number(id));
 
     if (!entrega) {
       throw new AppError("Entrega não encontrada", 404);
@@ -90,7 +109,7 @@ export class EntregasService {
       throw new AppError("Transição inválida", 400);
     }
 
-    return await this.repository.atualizar(entrega.id, entrega);
+    return await this.entregasRepository.atualizar(entrega.id, entrega);
   }
 
   async cancelarEntrega(id) {
@@ -110,11 +129,41 @@ export class EntregasService {
       descricao: "Entrega cancelada"
     });
 
-    return await this.repository.atualizar(entrega.id, entrega);
+    return await this.entregasRepository.atualizar(entrega.id, entrega);
   }
 
   async obterHistorico(id) {
     const entrega = await this.buscarPorId(id);
     return entrega.historico;
+  }
+
+  async atribuirMotorista(id, motoristaId) {
+    const entrega = await this.buscarPorId(id);
+
+    if (entrega.status !== STATUS.CRIADA) {
+      throw new AppError("Apenas entregas com status CRIADA podem receber motorista", 422);
+    }
+
+    const motorista = await this.motoristasRepository.buscarPorId(Number(motoristaId));
+
+    if (!motorista) {
+      throw new AppError("Motorista não encontrado", 404);
+    }
+
+    if (motorista.status !== STATUS_MOTORISTA.ATIVO) {
+      throw new AppError("Não é permitido atribuir motorista INATIVO", 422);
+    }
+
+    const substituiu = typeof entrega.motoristaId === "number" && entrega.motoristaId !== motorista.id;
+
+    entrega.motoristaId = motorista.id;
+    entrega.historico.push({
+      data: new Date().toISOString(),
+      descricao: substituiu
+        ? `Motorista substituído para ${motorista.nome}`
+        : `Motorista atribuído: ${motorista.nome}`
+    });
+
+    return this.entregasRepository.atualizar(entrega.id, entrega);
   }
 }
