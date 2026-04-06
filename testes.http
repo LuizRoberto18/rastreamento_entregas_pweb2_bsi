@@ -1,4 +1,6 @@
 @baseUrl = http://localhost:3000/api/entregas
+@apiUrl = http://localhost:3000/api
+@motoristasUrl = {{apiUrl}}/motoristas
 
 ### 🔹 1. Criar entrega (válida)
 POST {{baseUrl}}
@@ -77,4 +79,100 @@ Content-Type: application/json
   "descricao": "Teste inválido",
   "origem": "Maceió",
   "destino": "Maceió"
+}
+
+### ========================
+### Atividade 06 - Motoristas
+### ========================
+
+### 🔹 18. Cadastrar motorista (válido)
+POST {{motoristasUrl}}
+Content-Type: application/json
+
+{
+  "nome": "João Almeida",
+  "cpf": "12345678901",
+  "placaVeiculo": "ABC1D23"
+}
+
+### 🔹 19. Cadastrar segundo motorista (válido)
+POST {{motoristasUrl}}
+Content-Type: application/json
+
+{
+  "nome": "Maria Costa",
+  "cpf": "98765432100",
+  "placaVeiculo": "XYZ9K88"
+}
+
+### 🔹 20. Cadastrar motorista com CPF duplicado (erro esperado: 409)
+POST {{motoristasUrl}}
+Content-Type: application/json
+
+{
+  "nome": "João Duplicado",
+  "cpf": "12345678901",
+  "placaVeiculo": "AAA0A00"
+}
+
+### 🔹 21. Listar motoristas
+GET {{motoristasUrl}}
+
+### 🔹 22. Buscar motorista por ID
+GET {{motoristasUrl}}/1
+
+### 🔹 23. Buscar motorista inexistente (erro esperado: 404)
+GET {{motoristasUrl}}/999
+
+### 🔹 24. Criar entrega para teste de atribuição
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Pedido Atv06 - Atribuicao",
+  "origem": "Centro de Distribuição A",
+  "destino": "Cliente Final B"
+}
+
+### 🔹 25. Atribuir motorista ATIVO em entrega CRIADA (sucesso)
+PATCH {{baseUrl}}/3/atribuir
+Content-Type: application/json
+
+{
+  "motoristaId": 1
+}
+
+### 🔹 26. Listar entregas de um motorista
+GET {{motoristasUrl}}/1/entregas
+
+### 🔹 27. Listar entregas de um motorista com filtro combinado por status
+GET {{motoristasUrl}}/1/entregas?status=CRIADA
+
+### 🔹 28. Avançar entrega atribuída para EM_TRANSITO
+PATCH {{baseUrl}}/3/avancar
+
+### 🔹 29. Tentar atribuir motorista em entrega EM_TRANSITO (erro esperado: 422)
+PATCH {{baseUrl}}/3/atribuir
+Content-Type: application/json
+
+{
+  "motoristaId": 2
+}
+
+### 🔹 30. Criar nova entrega para validar motorista inexistente
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Pedido Atv06 - Motorista inexistente",
+  "origem": "Hub Norte",
+  "destino": "Hub Sul"
+}
+
+### 🔹 31. Tentar atribuir motorista inexistente (erro esperado: 404)
+PATCH {{baseUrl}}/4/atribuir
+Content-Type: application/json
+
+{
+  "motoristaId": 999
 }
