@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/LuizRoberto18/rastreamento_entregas_pweb2_bsi#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
     "jsdoc": "^3.6.11"

@@ -3,6 +3,134 @@
 API de rastreamento de entregas com arquitetura Controller -> Service -> Repository,
 persistencia em memoria e composicao de dependencias em ponto unico.
 
+## Atividade 07 (SQL simples, sem ORM)
+
+Foi adicionado um esqueleto para migrar persistencia em memoria para SQL simples,
+sem alterar a arquitetura principal (Controller -> Service -> Repository).
+
+Objetivo de implementacao:
+- manter services/controllers
+- trocar apenas repository em memoria por repository SQL
+- manter camadas desacopladas
+
+Arquivos-base criados:
+
+- `migration.sql`
+- `.env.example`
+- `src/database/pgPool.js` (conexao; queries continuam em SQL puro)
+- `src/repositories/sql/EntregasPgRepository.js`
+- `src/repositories/sql/MotoristasPgRepository.js`
+- `src/repositories/sql/RelatoriosPgRepository.js`
+- `src/controllers/RelatoriosController.js`
+- `src/routes/RelatoriosRoutes.js`
+
+Pontos de integracao comentados:
+
+- `src/routes/index.js` (troca de repository no ponto de composicao)
+- `src/server.js` (variaveis de ambiente)
+- repositories em memoria marcados como temporarios
+
+Checklist para concluir a atividade:
+
+1. Implementar `createPgPool` com `DATABASE_URL`.
+2. Implementar queries SQL dos repositories em `src/repositories/sql`.
+3. Trocar composicao em `src/routes/index.js` para usar repositories SQL.
+4. Registrar `createRelatoriosRouter` em `/api/relatorios`.
+5. Garantir tratamento de erro `23505` (UNIQUE CPF) como `AppError(409)`.
+6. Executar `migration.sql` em banco vazio e validar idempotencia.
+
+## Atividade 07 - Guia ponto a ponto (iniciante)
+
+### Ponto 1 - Modelagem do Banco (RF-01)
+
+Onde fazer:
+- `migration.sql`
+
+Passo a passo:
+1. Confirmar que existem as tabelas `motoristas`, `entregas`, `eventos_entrega`.
+2. Confirmar FK em `eventos_entrega.entrega_id` com `ON DELETE CASCADE`.
+3. Garantir `NOT NULL` para campos obrigatorios do dominio.
+4. Garantir status com `CHECK` (versao escolhida nesta atividade).
+
+### Ponto 2 - Migration Manual (RF-02)
+
+Onde fazer:
+- `migration.sql`
+
+Passo a passo:
+1. Usar `CREATE TABLE IF NOT EXISTS` em todas as tabelas.
+2. Usar `CREATE INDEX IF NOT EXISTS` nos indices.
+3. Rodar a migration duas vezes para validar idempotencia.
+
+### Ponto 3 - Repositories com SQL simples (RF-03)
+
+Onde fazer:
+- `src/database/pgPool.js`
+- `src/repositories/sql/EntregasPgRepository.js`
+- `src/repositories/sql/MotoristasPgRepository.js`
+- `src/routes/index.js` (composicao)
+
+Passo a passo:
+1. Implementar conexao SQL em `pgPool.js` usando `DATABASE_URL`.
+2. Implementar queries SQL em `EntregasPgRepository` e `MotoristasPgRepository`.
+3. Em `routes/index.js`, trocar repositories em memoria pelos SQL.
+4. Nao alterar `EntregasService` nem `MotoristasService`.
+
+### Ponto 4 - Tratamento de Erros do Banco (RF-04)
+
+Onde fazer:
+- `src/repositories/sql/MotoristasPgRepository.js`
+- `src/repositories/sql/EntregasPgRepository.js`
+
+Passo a passo:
+1. Capturar erro de banco `23505` no `criar` de motorista.
+2. Relancar como `AppError` com status `409`.
+3. Em `buscarPorId`/`buscarPorCPF`, retornar `null` quando nao encontrar.
+
+### Ponto 5 - Relatorios agregados (RF-05)
+
+Onde fazer:
+- `src/repositories/sql/RelatoriosPgRepository.js`
+- `src/controllers/RelatoriosController.js`
+- `src/routes/RelatoriosRoutes.js`
+- `src/routes/index.js`
+
+Passo a passo:
+1. Implementar query `GROUP BY` para entregas por status.
+2. Implementar query com `JOIN + GROUP BY` para motoristas com entregas em aberto.
+3. Implementar controller chamando repository e retornando JSON.
+4. Registrar `router.use("/relatorios", ...)` em `routes/index.js`.
+
+### Ponto 6 - Variaveis de ambiente
+
+Onde fazer:
+- `.env.example`
+- `src/server.js`
+- `src/database/pgPool.js`
+
+Passo a passo:
+1. Preencher `DATABASE_URL` no `.env` local (base no `.env.example`).
+2. Garantir que a aplicacao leia as variaveis antes da composicao.
+3. Usar `process.env.PORT || 3000` para porta.
+
+### Ponto 7 - Cenarios de teste esperados
+
+Onde validar:
+- `testes.http` (ou client HTTP de sua preferencia)
+
+Passo a passo:
+1. Criar dados, reiniciar servidor e confirmar persistencia.
+2. Testar CPF duplicado e validar `409`.
+3. Testar os dois endpoints de relatorio e conferir formato de resposta.
+
+### Ponto 8 - Entregavel final
+
+Checklist final:
+1. `migration.sql` funcional.
+2. Repositories SQL implementados.
+3. `.env.example` presente.
+4. Services sem alteracoes de codigo.
+
 ## Autor
 
 - Nome: LuizRoberto18
