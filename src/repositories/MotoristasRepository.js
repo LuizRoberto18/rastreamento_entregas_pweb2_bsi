@@ -1,9 +1,5 @@
 /** @typedef {Object} IMotoristasRepository */
 
-// TODO (Atividade 07):
-// Este repository em memoria deve ser substituido por src/repositories/sql/MotoristasPgRepository.js.
-// Regra pedagogica: manter o mesmo contrato consumido pelo service.
-
 /** @implements {IMotoristasRepository} */
 export class MotoristasRepository {
   constructor(database) {

@@ -1,16 +1,9 @@
 import express from "express";
+import dotenv from "dotenv";
 import { createApiRouter } from "./routes/index.js";
 import { AppError } from "./utils/AppError.js";
 
-// GUIA RAPIDO (Atividade 07) para iniciantes:
-// PASSO 1 - Aqui em server.js:
-// 1) Instale e configure dotenv (ou outra abordagem) para carregar .env antes de criar as rotas.
-// 2) Troque PORT fixo por: process.env.PORT || 3000.
-// 3) Nao precisa acessar banco diretamente neste arquivo.
-//    A conexao SQL e a troca de repository devem ser montadas em src/routes/index.js.
-// 4) Mantenha este middleware de erro como ponto central de resposta HTTP.
-//    Ele ja converte AppError em status/mensagem corretos para a API.
-require('dotenv').config();
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;

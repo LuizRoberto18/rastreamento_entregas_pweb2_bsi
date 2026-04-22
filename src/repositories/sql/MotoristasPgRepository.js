@@ -2,66 +2,134 @@ import { AppError } from "../../utils/AppError.js";
 
 /** @typedef {import("../contracts.js").IMotoristasRepository} IMotoristasRepository */
 
-/**
- * Repository SQL puro para motoristas.
- *
- * Regra importante:
- * - Violacao UNIQUE de CPF (codigo 23505) deve virar erro de dominio (ex.: AppError 409).
- *
- * Onde esta regra impacta:
- * - Metodo criar(dados), no bloco catch.
- */
+
 export class MotoristasPgRepository {
   constructor(pool) {
     this.pool = pool;
   }
 
+  mapMotorista(row) {
+    return {
+      id: row.id,
+      nome: row.nome,
+      cpf: row.cpf,
+      placaVeiculo: row.placaVeiculo,
+      status: row.status
+    };
+  }
+
   async listarTodos() {
-    // PASSO A PASSO:
-    // 1) Fazer SELECT das colunas necessarias em motoristas.
-    // 2) Ordenar por id para resposta previsivel.
-    // 3) Mapear placa_veiculo -> placaVeiculo.
-    throw new Error("TODO: implementar listarTodos");
+    const result = await this.pool.query(
+      `
+      SELECT
+        id,
+        nome,
+        cpf,
+        placa_veiculo AS "placaVeiculo",
+        status
+      FROM motoristas
+      ORDER BY id ASC
+      `
+    );
+
+    return result.rows.map((row) => this.mapMotorista(row));
   }
 
   async buscarPorId(id) {
-    // PASSO A PASSO:
-    // 1) SELECT por id com parametro.
-    // 2) Se nao houver linha, retornar null.
-    // 3) Se houver, mapear para objeto de dominio.
-    throw new Error("TODO: implementar buscarPorId");
+    const result = await this.pool.query(
+      `
+      SELECT
+        id,
+        nome,
+        cpf,
+        placa_veiculo AS "placaVeiculo",
+        status
+      FROM motoristas
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return null;
+    }
+
+    return this.mapMotorista(result.rows[0]);
   }
 
   async buscarPorCPF(cpf) {
-    // PASSO A PASSO:
-    // 1) SELECT por cpf com parametro.
-    // 2) Se nao encontrar, retornar null (nao lancar excecao).
-    // 3) Se encontrar, retornar objeto do motorista.
-    throw new Error("TODO: implementar buscarPorCPF");
+    const result = await this.pool.query(
+      `
+      SELECT
+        id,
+        nome,
+        cpf,
+        placa_veiculo AS "placaVeiculo",
+        status
+      FROM motoristas
+      WHERE cpf = $1
+      `,
+      [cpf]
+    );
+
+    if (result.rowCount === 0) {
+      return null;
+    }
+
+    return this.mapMotorista(result.rows[0]);
   }
 
   async criar(dados) {
-    // PASSO A PASSO:
-    // 1) Executar INSERT em motoristas com RETURNING.
-    // 2) Envolver em try/catch.
-    // 3) No catch, verificar err.code === "23505" (UNIQUE).
-    // 4) Quando for 23505, lancar AppError com status 409.
-    // 5) Para qualquer outro erro, relancar erro original.
+    try {
+      const result = await this.pool.query(
+        `
+        INSERT INTO motoristas (nome, cpf, placa_veiculo, status)
+        VALUES ($1, $2, $3, $4)
+        RETURNING
+          id,
+          nome,
+          cpf,
+          placa_veiculo AS "placaVeiculo",
+          status
+        `,
+        [dados.nome, dados.cpf, dados.placaVeiculo, dados.status]
+      );
 
-    // Exemplo de regra:
-    // if (err.code === "23505") {
-    //   throw new AppError("CPF ja cadastrado no sistema", 409);
-    // }
+      return this.mapMotorista(result.rows[0]);
+    } catch (err) {
+      if (err.code === "23505") {
+        throw new AppError("CPF ja cadastrado no sistema", 409);
+      }
 
-    throw new Error("TODO: implementar criar com tratamento de UNIQUE");
+      throw err;
+    }
   }
 
   async atualizar(id, dados) {
-    // PASSO A PASSO:
-    // 1) Verificar se motorista existe; se nao, retornar null.
-    // 2) Executar UPDATE apenas dos campos permitidos.
-    // 3) Usar RETURNING para devolver estado final.
-    // 4) Mapear snake_case para camelCase.
-    throw new Error("TODO: implementar atualizar");
+    const existente = await this.buscarPorId(id);
+    if (!existente) {
+      return null;
+    }
+
+    const result = await this.pool.query(
+      `
+      UPDATE motoristas
+      SET
+        nome = $1,
+        cpf = $2,
+        placa_veiculo = $3,
+        status = $4
+      WHERE id = $5
+      RETURNING
+        id,
+        nome,
+        cpf,
+        placa_veiculo AS "placaVeiculo",
+        status
+      `,
+      [dados.nome, dados.cpf, dados.placaVeiculo, dados.status, id]
+    );
+
+    return this.mapMotorista(result.rows[0]);
   }
 }

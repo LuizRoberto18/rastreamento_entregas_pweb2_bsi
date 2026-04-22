@@ -5,12 +5,8 @@ export class RelatoriosController {
 
   getEntregasPorStatus = async (req, res, next) => {
     try {
-      // PASSO A PASSO:
-      // 1) Chamar this.relatoriosRepository.entregasPorStatus().
-      // 2) Receber objeto agregado.
-      // 3) Retornar com res.json(objeto).
-      // 4) Em caso de erro, manter fluxo no next(err).
-      throw new Error("TODO: implementar getEntregasPorStatus");
+      const resultado = await this.relatoriosRepository.entregasPorStatus();
+      res.json(resultado);
     } catch (err) {
       next(err);
     }
@@ -18,12 +14,8 @@ export class RelatoriosController {
 
   getMotoristasAtivos = async (req, res, next) => {
     try {
-      // PASSO A PASSO:
-      // 1) Chamar this.relatoriosRepository.motoristasAtivosComEntregasEmAberto().
-      // 2) Receber array de motoristas com contagem.
-      // 3) Retornar com res.json(array).
-      // 4) Em caso de erro, manter fluxo no next(err).
-      throw new Error("TODO: implementar getMotoristasAtivos");
+      const resultado = await this.relatoriosRepository.motoristasAtivosComEntregasEmAberto();
+      res.json(resultado);
     } catch (err) {
       next(err);
     }

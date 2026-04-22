@@ -1,17 +1,6 @@
 /** @typedef {import("../contracts.js").IEntregasRepository} IEntregasRepository */
 
-/**
- * Repository SQL puro para entregas.
- *
- * Regras da atividade:
- * - Manter assinatura dos metodos do contrato da Atividade 06.
- * - Retornar null quando nao encontrar registro (nao lancar excecao).
- * - Traduzir erro de banco para erro de dominio na camada apropriada.
- *
- * Mapa de colunas (banco -> objeto JS):
- * - motorista_id -> motoristaId
- * - data_evento -> historico[].data
- */
+
 export class EntregasPgRepository {
     constructor(pool) {
         this.pool = pool;
@@ -49,28 +38,46 @@ export class EntregasPgRepository {
     `;
 
         const result = await this.pool.query(sql, values);
+        const entregas = result.rows.map((row) => ({
+            id: row.id,
+            descricao: row.descricao,
+            origem: row.origem,
+            destino: row.destino,
+            status: row.status,
+            motoristaId: row.motoristaId,
+            historico: []
+        }));
 
-        for (const row of result.rows) {
-            const eventosResult = await this.pool.query(
-                `
-            SELECT data, descricao
-            FROM entregas_historico
-            WHERE entrega_id = $1
-            ORDER BY data ASC
-            `);
-
-            entregas.push({
-                id: row.id,
-                descricao: row.descricao,
-                origem: row.origem,
-                destino: row.destino,
-                status: row.status,
-                motoristaId: row.motoristaId,
-                historico: eventosResult.rows
-            });
+        if (entregas.length === 0) {
+            return entregas;
         }
+
+        const entregaIds = entregas.map((entrega) => entrega.id);
+        const eventosResult = await this.pool.query(
+            `
+            SELECT entrega_id, data_evento AS data, descricao
+            FROM eventos_entrega
+            WHERE entrega_id = ANY($1::bigint[])
+            ORDER BY entrega_id ASC, data_evento ASC
+            `,
+            [entregaIds]
+        );
+
+        const historicoPorEntregaId = new Map();
+        for (const evento of eventosResult.rows) {
+            const atual = historicoPorEntregaId.get(evento.entrega_id) || [];
+            atual.push({
+                data: evento.data instanceof Date ? evento.data.toISOString() : evento.data,
+                descricao: evento.descricao
+            });
+            historicoPorEntregaId.set(evento.entrega_id, atual);
+        }
+
+        for (const entrega of entregas) {
+            entrega.historico = historicoPorEntregaId.get(entrega.id) || [];
+        }
+
         return entregas;
-        throw new Error("TODO: implementar listarTodos com SQL parametrizado");
     }
 
     async buscarPorId(id) {
@@ -117,7 +124,10 @@ export class EntregasPgRepository {
 
             return {
                 ...entrega,
-                historico: historicoResult.rows
+                historico: historicoResult.rows.map((evento) => ({
+                    data: evento.data instanceof Date ? evento.data.toISOString() : evento.data,
+                    descricao: evento.descricao
+                }))
             };
 
         } catch (error) {
@@ -174,7 +184,10 @@ export class EntregasPgRepository {
 
             return {
                 ...entrega,
-                historico: dados.historico || []
+                historico: (dados.historico || []).map((evento) => ({
+                    data: evento.data instanceof Date ? evento.data.toISOString() : evento.data,
+                    descricao: evento.descricao
+                }))
             };
 
         } catch (error) {
@@ -233,7 +246,6 @@ export class EntregasPgRepository {
 
             const entrega = updateResult.rows[0];
 
-            // 🔥 Estratégia simples: recriar histórico
             await client.query(
                 `DELETE FROM eventos_entrega WHERE entrega_id = $1`,
                 [id]
@@ -255,7 +267,10 @@ export class EntregasPgRepository {
 
             return {
                 ...entrega,
-                historico: dadosAtualizados.historico || []
+                historico: (dadosAtualizados.historico || []).map((evento) => ({
+                    data: evento.data instanceof Date ? evento.data.toISOString() : evento.data,
+                    descricao: evento.descricao
+                }))
             };
 
         } catch (error) {
