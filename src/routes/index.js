@@ -1,12 +1,12 @@
 import express from "express";
 import { createPgPool } from "../database/pgPool.js";
-import { Database } from "../database/database.js";
-import { EntregasRepository } from "../repositories/EntregasRepository.js";
-import { MotoristasRepository } from "../repositories/MotoristasRepository.js";
-import { RelatoriosRepository } from "../repositories/RelatoriosRepository.js";
+import { createSqliteDatabase } from "../database/sqliteDb.js";
 import { EntregasPgRepository } from "../repositories/sql/EntregasPgRepository.js";
 import { MotoristasPgRepository } from "../repositories/sql/MotoristasPgRepository.js";
 import { RelatoriosPgRepository } from "../repositories/sql/RelatoriosPgRepository.js";
+import { EntregasSqliteRepository } from "../repositories/sql/EntregasSqliteRepository.js";
+import { MotoristasSqliteRepository } from "../repositories/sql/MotoristasSqliteRepository.js";
+import { RelatoriosSqliteRepository } from "../repositories/sql/RelatoriosSqliteRepository.js";
 import { EntregasService } from "../services/EntregasService.js";
 import { MotoristasService } from "../services/MotoristasService.js";
 import { EntregasController } from "../controllers/EntregasController.js";
@@ -31,11 +31,11 @@ export function createApiRouter() {
     motoristasRepo = new MotoristasPgRepository(pool);
     relatoriosRepo = new RelatoriosPgRepository(pool);
   } else {
-    const database = new Database();
-    entregasRepo = new EntregasRepository(database);
-    motoristasRepo = new MotoristasRepository(database);
-    relatoriosRepo = new RelatoriosRepository(database);
-    console.warn("DATABASE_URL nao definida. API iniciada em modo memoria.");
+    const db = createSqliteDatabase();
+    entregasRepo = new EntregasSqliteRepository(db);
+    motoristasRepo = new MotoristasSqliteRepository(db);
+    relatoriosRepo = new RelatoriosSqliteRepository(db);
+    console.warn("DATABASE_URL nao definida. API iniciada com SQLite local.");
   }
 
   const entregasService = new EntregasService(entregasRepo, motoristasRepo);

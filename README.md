@@ -1,16 +1,16 @@
 # rastreamento_entregas_pweb2_bsi
 
 API de rastreamento de entregas com arquitetura Controller -> Service -> Repository,
-persistencia em memoria e composicao de dependencias em ponto unico.
+persistencia SQL (PostgreSQL ou SQLite local) e composicao de dependencias em ponto unico.
 
 ## Atividade 07 (SQL simples, sem ORM)
 
-Foi adicionado um esqueleto para migrar persistencia em memoria para SQL simples,
+Foi adicionado um esqueleto para migrar persistencia para SQL simples,
 sem alterar a arquitetura principal (Controller -> Service -> Repository).
 
 Objetivo de implementacao:
 - manter services/controllers
-- trocar apenas repository em memoria por repository SQL
+- trocar apenas repository por implementacao SQL
 - manter camadas desacopladas
 
 Arquivos-base criados:
@@ -28,7 +28,7 @@ Pontos de integracao comentados:
 
 - `src/routes/index.js` (troca de repository no ponto de composicao)
 - `src/server.js` (variaveis de ambiente)
-- repositories em memoria marcados como temporarios
+- fallback local com SQLite quando `DATABASE_URL` nao estiver definida
 
 Checklist para concluir a atividade:
 
@@ -110,8 +110,9 @@ Onde fazer:
 
 Passo a passo:
 1. Preencher `DATABASE_URL` no `.env` local (base no `.env.example`).
-2. Garantir que a aplicacao leia as variaveis antes da composicao.
-3. Usar `process.env.PORT || 3000` para porta.
+2. Se nao usar PostgreSQL, configurar `SQLITE_PATH` no `.env` local.
+3. Garantir que a aplicacao leia as variaveis antes da composicao.
+4. Usar `process.env.PORT || 3000` para porta.
 
 ### Ponto 7 - Cenarios de teste esperados
 
@@ -224,9 +225,9 @@ A composicao ocorre em ponto unico:
 Exemplo:
 
 ```js
-const database = new Database();
-const entregasRepo = new EntregasRepository(database);
-const motoristasRepo = new MotoristasRepository(database);
+const db = createSqliteDatabase();
+const entregasRepo = new EntregasSqliteRepository(db);
+const motoristasRepo = new MotoristasSqliteRepository(db);
 const entregasService = new EntregasService(entregasRepo, motoristasRepo);
 const motoristasService = new MotoristasService(motoristasRepo);
 ```
