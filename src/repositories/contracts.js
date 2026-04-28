@@ -24,6 +24,10 @@
  * @typedef {Object} EntregasFiltros
  * @property {string} [status]
  * @property {number} [motoristaId]
+ * @property {Date} [createdDe]
+ * @property {Date} [createdAte]
+ * @property {number} [page]
+ * @property {number} [limit]
  */
 
 /**

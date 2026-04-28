@@ -8,11 +8,6 @@
 @entregaId2 = 2
 @entregaId3 = 3
 
-### IMPORTANTE:
-### Se o seu cliente HTTP nao suporta scripts do tipo `> {% ... %}`,
-### execute os POSTs de criacao e atualize manualmente os IDs acima
-### com os valores retornados no corpo da resposta.
-
 ### 1) Criar motorista 1 (esperado: 201)
 POST {{motoristasUrl}}
 Content-Type: application/json
@@ -176,3 +171,15 @@ GET {{relatoriosUrl}}/entregas-por-status
 
 ### 31) Relatorio: motoristas ativos com entregas em aberto (esperado: 200)
 GET {{relatoriosUrl}}/motoristas-ativos
+
+### 32) Entregas com paginacao (esperado: 200, data com no maximo 3 itens)
+GET {{entregasUrl}}?page=1&limit=3
+
+### 33) Entregas com paginacao e status (esperado: 200)
+GET {{entregasUrl}}?status=EM_TRANSITO&page=2&limit=5
+
+### 34) Entregas por intervalo de datas (esperado: 200)
+GET {{entregasUrl}}?createdDe=2025-01-01&createdAte=2025-03-31
+
+### 35) Filtro combinado com motorista e status (esperado: 200)
+GET {{entregasUrl}}?motoristaId=1&status=CRIADA&page=1&limit=10

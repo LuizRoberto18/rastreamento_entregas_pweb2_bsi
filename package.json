@@ -6,7 +6,13 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docs:jsdoc": "jsdoc -c jsdoc.json"
+    "docs:jsdoc": "jsdoc -c jsdoc.json",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "prisma:seed": "node prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "repository": {
     "type": "git",
@@ -19,10 +25,10 @@
   },
   "homepage": "https://github.com/LuizRoberto18/rastreamento_entregas_pweb2_bsi#readme",
   "dependencies": {
-    "better-sqlite3": "^12.9.0",
+    "@prisma/client": "^6.18.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "pg": "^8.13.1"
+    "prisma": "^6.18.0"
   },
   "devDependencies": {
     "jsdoc": "^3.6.11"

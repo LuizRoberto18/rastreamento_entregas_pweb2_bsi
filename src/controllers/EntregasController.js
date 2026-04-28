@@ -1,16 +1,61 @@
+import { AppError } from "../utils/AppError.js";
+
 export class EntregasController {
     constructor(service) {
         this.service = service;
     }
     listarEntregas = async (req, res, next) => {
         try {
-            const { status } = req.query;
-            const result = await this.service.listarEntregas(status);
+            const { status, motoristaId, createdDe, createdAte } = req.query;
 
-            if (result.length === 0) {
-                return res.status(404).json({ message: "Nenhuma entrega cadastrada" })
+            const parsedPage = Number(req.query.page);
+            const parsedLimit = Number(req.query.limit);
+
+            const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+            const limitValue = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10;
+            const limit = Math.min(limitValue, 50);
+
+            const createdDeDate = createdDe ? new Date(createdDe) : null;
+            const createdAteDate = createdAte ? new Date(createdAte) : null;
+
+            if (createdDe && Number.isNaN(createdDeDate?.getTime())) {
+                throw new AppError("Parametro createdDe invalido. Use ISO 8601", 400);
             }
-            res.json(result)
+
+            if (createdAte && Number.isNaN(createdAteDate?.getTime())) {
+                throw new AppError("Parametro createdAte invalido. Use ISO 8601", 400);
+            }
+
+            if (createdAteDate && !String(createdAte).includes("T")) {
+                createdAteDate.setHours(23, 59, 59, 999);
+            }
+
+            if (motoristaId !== undefined && Number.isNaN(Number(motoristaId))) {
+                throw new AppError("Parametro motoristaId invalido", 400);
+            }
+
+            const filtros = {
+                ...(status ? { status } : {}),
+                ...(motoristaId !== undefined ? { motoristaId: Number(motoristaId) } : {}),
+                ...(createdDeDate ? { createdDe: createdDeDate } : {}),
+                ...(createdAteDate ? { createdAte: createdAteDate } : {})
+            };
+
+            const [totalData, data] = await Promise.all([
+                this.service.listarEntregas(filtros),
+                this.service.listarEntregas({ ...filtros, page, limit })
+            ]);
+
+            const total = totalData.length;
+            const totalPages = Math.max(1, Math.ceil(total / limit));
+
+            res.json({
+                data,
+                total,
+                page,
+                limit,
+                totalPages
+            });
         } catch (err) {
             next(err);
         }

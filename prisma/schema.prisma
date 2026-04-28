@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum EntregaStatus {
+  CRIADA
+  EM_TRANSITO
+  ENTREGUE
+  CANCELADA
+}
+
+enum MotoristaStatus {
+  ATIVO
+  INATIVO
+}
+
+model Entrega {
+  id         Int            @id @default(autoincrement())
+  descricao  String
+  origem     String
+  destino    String
+  status     EntregaStatus
+  motoristaId Int?          @map("motorista_id")
+  motorista  Motorista?     @relation(fields: [motoristaId], references: [id], onDelete: SetNull)
+  eventos    EventoEntrega[]
+  createdAt  DateTime       @default(now()) @map("criado_em")
+  updatedAt  DateTime       @updatedAt @map("atualizado_em")
+
+  @@index([status])
+  @@index([motoristaId])
+  @@map("entregas")
+}
+
+model EventoEntrega {
+  id         Int      @id @default(autoincrement())
+  entregaId  Int      @map("entrega_id")
+  entrega    Entrega  @relation(fields: [entregaId], references: [id], onDelete: Cascade)
+  dataEvento DateTime @map("data_evento")
+  descricao  String
+  createdAt  DateTime @default(now()) @map("criado_em")
+  updatedAt  DateTime @updatedAt @map("atualizado_em")
+
+  @@index([entregaId])
+  @@map("eventos_entrega")
+}
+
+model Motorista {
+  id           Int             @id @default(autoincrement())
+  nome         String
+  cpf          String          @unique
+  placaVeiculo String          @map("placa_veiculo")
+  status       MotoristaStatus
+  entregas     Entrega[]
+  createdAt    DateTime        @default(now()) @map("criado_em")
+  updatedAt    DateTime        @updatedAt @map("atualizado_em")
+
+  @@map("motoristas")
+}
