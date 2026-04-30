@@ -1,0 +1,32 @@
+<div class="page-title">
+  <h1>Nova entrega</h1>
+  <a class="button button--ghost" href="/painel/entregas">Voltar</a>
+</div>
+
+<div class="card">
+  <% if (errors?.length) { %>
+    <div class="flash flash--error">
+      <% errors.forEach((error) => { %>
+        <div><%= error %></div>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <form method="POST" action="/painel/entregas" class="form-grid">
+    <div class="field">
+      <label for="descricao">Descricao</label>
+      <input id="descricao" name="descricao" required value="<%= formValues.descricao %>" />
+    </div>
+    <div class="field">
+      <label for="origem">Origem</label>
+      <input id="origem" name="origem" required value="<%= formValues.origem %>" />
+    </div>
+    <div class="field">
+      <label for="destino">Destino</label>
+      <input id="destino" name="destino" required value="<%= formValues.destino %>" />
+    </div>
+    <div class="field" style="align-self:flex-end;">
+      <button class="button" type="submit">Criar entrega</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,70 @@
+<div class="page-title">
+  <h1>Entregas</h1>
+  <a class="button" href="/painel/entregas/nova">Nova entrega</a>
+</div>
+
+<div class="card">
+  <form method="GET" action="/painel/entregas" class="form-grid">
+    <div class="field">
+      <label for="status">Filtrar por status</label>
+      <select id="status" name="status">
+        <option value="">Todos</option>
+        <% statusOptions.forEach((status) => { %>
+          <option value="<%= status %>" <%= statusSelecionado === status ? "selected" : "" %>><%= status %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="field" style="align-self:flex-end;">
+      <button class="button button--ghost" type="submit">Aplicar filtro</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <% if (!entregas.length) { %>
+    <p>Nenhuma entrega encontrada.</p>
+  <% } else { %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Descricao</th>
+          <th>Origem</th>
+          <th>Destino</th>
+          <th>Status</th>
+          <th>Motorista</th>
+          <th>Data de criacao</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% entregas.forEach((entrega) => { %>
+          <tr>
+            <td><%= entrega.descricao %></td>
+            <td><%= entrega.origem %></td>
+            <td><%= entrega.destino %></td>
+            <td><span class="badge badge--<%= entrega.status %>"><%= entrega.status %></span></td>
+            <td><%= entrega.motoristaNome %></td>
+            <td><%= entrega.createdAt ? new Date(entrega.createdAt).toLocaleString("pt-BR") : "-" %></td>
+            <td><a class="button button--ghost" href="/painel/entregas/<%= entrega.id %>">Detalhe</a></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <% if (totalPages > 1) { %>
+    <% const statusQuery = statusSelecionado ? `status=${encodeURIComponent(statusSelecionado)}` : ""; %>
+    <% const pageLink = (pageNumber) => `/painel/entregas?${statusQuery}${statusQuery ? "&" : ""}page=${pageNumber}`; %>
+    <div class="pagination">
+      <% if (page > 1) { %>
+        <a href="<%= pageLink(page - 1) %>">Anterior</a>
+      <% } %>
+      <% for (let i = 1; i <= totalPages; i += 1) { %>
+        <a href="<%= pageLink(i) %>" class="<%= i === page ? "active" : "" %>"><%= i %></a>
+      <% } %>
+      <% if (page < totalPages) { %>
+        <a href="<%= pageLink(page + 1) %>">Proxima</a>
+      <% } %>
+    </div>
+  <% } %>
+</div>

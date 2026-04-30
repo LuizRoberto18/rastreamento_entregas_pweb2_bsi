@@ -1,0 +1,32 @@
+<div class="page-title">
+  <h1>Novo motorista</h1>
+  <a class="button button--ghost" href="/painel/motoristas">Voltar</a>
+</div>
+
+<div class="card">
+  <% if (errors?.length) { %>
+    <div class="flash flash--error">
+      <% errors.forEach((error) => { %>
+        <div><%= error %></div>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <form method="POST" action="/painel/motoristas" class="form-grid">
+    <div class="field">
+      <label for="nome">Nome</label>
+      <input id="nome" name="nome" required value="<%= formValues.nome %>" />
+    </div>
+    <div class="field">
+      <label for="cpf">CPF</label>
+      <input id="cpf" name="cpf" required value="<%= formValues.cpf %>" />
+    </div>
+    <div class="field">
+      <label for="placaVeiculo">Placa do veiculo</label>
+      <input id="placaVeiculo" name="placaVeiculo" required value="<%= formValues.placaVeiculo %>" />
+    </div>
+    <div class="field" style="align-self:flex-end;">
+      <button class="button" type="submit">Cadastrar motorista</button>
+    </div>
+  </form>
+</div>

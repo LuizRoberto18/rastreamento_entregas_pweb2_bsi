@@ -1,0 +1,50 @@
+<div class="page-title">
+  <h1>Entrega #<%= entrega.id %></h1>
+  <a class="button button--ghost" href="/painel/entregas">Voltar</a>
+</div>
+
+<div class="card">
+  <p><strong>Descricao:</strong> <%= entrega.descricao %></p>
+  <p><strong>Origem:</strong> <%= entrega.origem %></p>
+  <p><strong>Destino:</strong> <%= entrega.destino %></p>
+  <p><strong>Status:</strong> <span class="badge badge--<%= entrega.status %>"><%= entrega.status %></span></p>
+  <p><strong>Motorista:</strong> <%= motorista ? motorista.nome : "Sem motorista" %></p>
+
+  <div class="actions" style="margin-top:16px;">
+    <form method="POST" action="/painel/entregas/<%= entrega.id %>/avancar">
+      <input type="hidden" name="_method" value="PATCH" />
+      <button class="button button--warn" type="submit">Avancar status</button>
+    </form>
+    <form method="POST" action="/painel/entregas/<%= entrega.id %>/cancelar">
+      <input type="hidden" name="_method" value="PATCH" />
+      <button class="button button--danger" type="submit">Cancelar entrega</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Historico</h2>
+  <% if (!historico.length) { %>
+    <p>Sem eventos registrados.</p>
+  <% } else { %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Hora</th>
+          <th>Descricao</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% historico.forEach((evento) => { %>
+          <% const dateObj = new Date(evento.data); %>
+          <tr>
+            <td><%= dateObj.toLocaleDateString("pt-BR") %></td>
+            <td><%= dateObj.toLocaleTimeString("pt-BR") %></td>
+            <td><%= evento.descricao %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</div>
