@@ -183,3 +183,132 @@ GET {{entregasUrl}}?createdDe=2025-01-01&createdAte=2025-03-31
 
 ### 35) Filtro combinado com motorista e status (esperado: 200)
 GET {{entregasUrl}}?motoristaId=1&status=CRIADA&page=1&limit=10
+
+### --- Seed rapido (ajuste os IDs abaixo conforme as respostas) ---
+@seedMotoristaId1 = 1
+@seedMotoristaId2 = 2
+@seedMotoristaId3 = 3
+@seedEntregaId1 = 1
+@seedEntregaId2 = 2
+@seedEntregaId3 = 3
+@seedEntregaId4 = 4
+@seedEntregaId5 = 5
+
+### Seed 1) Criar motorista A
+POST {{motoristasUrl}}
+Content-Type: application/json
+
+{
+  "nome": "Ana Martins",
+  "cpf": "44444444444",
+  "placaVeiculo": "DEF4G56"
+}
+
+### Seed 2) Criar motorista B
+POST {{motoristasUrl}}
+Content-Type: application/json
+
+{
+  "nome": "Bruno Alves",
+  "cpf": "55555555555",
+  "placaVeiculo": "GHI7J89"
+}
+
+### Seed 3) Criar motorista C
+POST {{motoristasUrl}}
+Content-Type: application/json
+
+{
+  "nome": "Carla Souza",
+  "cpf": "66666666666",
+  "placaVeiculo": "JKL1M23"
+}
+
+### Seed 4) Criar entrega A (vai para ENTREGUE)
+POST {{entregasUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Notebook Gamer",
+  "origem": "Campinas",
+  "destino": "Santos"
+}
+
+### Seed 5) Criar entrega B (fica EM_TRANSITO)
+POST {{entregasUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Smart TV 50",
+  "origem": "Belo Horizonte",
+  "destino": "Vitoria"
+}
+
+### Seed 6) Criar entrega C (vai para CANCELADA)
+POST {{entregasUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Mesa Escritorio",
+  "origem": "Curitiba",
+  "destino": "Londrina"
+}
+
+### Seed 7) Criar entrega D (sem motorista)
+POST {{entregasUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Impressora Laser",
+  "origem": "Porto Alegre",
+  "destino": "Caxias do Sul"
+}
+
+### Seed 8) Criar entrega E (atribui e cancela)
+POST {{entregasUrl}}
+Content-Type: application/json
+
+{
+  "descricao": "Teclado Mecanico",
+  "origem": "Goiania",
+  "destino": "Brasilia"
+}
+
+### Seed 9) Atribuir motorista A na entrega A
+PATCH {{entregasUrl}}/{{seedEntregaId1}}/atribuir
+Content-Type: application/json
+
+{
+  "motoristaId": {{seedMotoristaId1}}
+}
+
+### Seed 10) Avancar entrega A para EM_TRANSITO
+PATCH {{entregasUrl}}/{{seedEntregaId1}}/avancar
+
+### Seed 11) Avancar entrega A para ENTREGUE
+PATCH {{entregasUrl}}/{{seedEntregaId1}}/avancar
+
+### Seed 12) Atribuir motorista B na entrega B
+PATCH {{entregasUrl}}/{{seedEntregaId2}}/atribuir
+Content-Type: application/json
+
+{
+  "motoristaId": {{seedMotoristaId2}}
+}
+
+### Seed 13) Avancar entrega B para EM_TRANSITO
+PATCH {{entregasUrl}}/{{seedEntregaId2}}/avancar
+
+### Seed 14) Cancelar entrega C
+PATCH {{entregasUrl}}/{{seedEntregaId3}}/cancelar
+
+### Seed 15) Atribuir motorista C na entrega E
+PATCH {{entregasUrl}}/{{seedEntregaId5}}/atribuir
+Content-Type: application/json
+
+{
+  "motoristaId": {{seedMotoristaId3}}
+}
+
+### Seed 16) Cancelar entrega E
+PATCH {{entregasUrl}}/{{seedEntregaId5}}/cancelar

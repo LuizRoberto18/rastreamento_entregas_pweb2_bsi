@@ -41,4 +41,15 @@ export class MotoristasService {
 
     return motorista;
   }
+
+  async atualizarStatus(id, status) {
+    const motorista = await this.buscarPorId(id);
+
+    return this.motoristasRepository.atualizar(Number(id), {
+      nome: motorista.nome,
+      cpf: motorista.cpf,
+      placaVeiculo: motorista.placaVeiculo,
+      status
+    });
+  }
 }

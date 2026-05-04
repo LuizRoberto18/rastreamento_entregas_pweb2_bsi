@@ -14,6 +14,7 @@
           <th>CPF</th>
           <th>Placa</th>
           <th>Status</th>
+          <th>Acoes</th>
         </tr>
       </thead>
       <tbody>
@@ -23,6 +24,17 @@
             <td><%= motorista.cpf %></td>
             <td><%= motorista.placaVeiculo %></td>
             <td><span class="badge badge--<%= motorista.status %>"><%= motorista.status %></span></td>
+            <td>
+              <% if (motorista.status === "ATIVO") { %>
+                <form method="POST" action="/painel/motoristas/<%= motorista.id %>/inativar" style="display:inline;">
+                  <button class="button button--danger" type="submit">Inativar</button>
+                </form>
+              <% } else { %>
+                <form method="POST" action="/painel/motoristas/<%= motorista.id %>/ativar" style="display:inline;">
+                  <button class="button" type="submit">Ativar</button>
+                </form>
+              <% } %>
+            </td>
           </tr>
         <% }); %>
       </tbody>

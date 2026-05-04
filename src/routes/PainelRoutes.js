@@ -2,22 +2,26 @@ import express from "express";
 import { prisma } from "../database/prismaClient.js";
 import { EntregasPrismaRepository } from "../repositories/prisma/EntregasPrismaRepository.js";
 import { MotoristasPrismaRepository } from "../repositories/prisma/MotoristasPrismaRepository.js";
+import { RelatoriosPrismaRepository } from "../repositories/prisma/RelatoriosPrismaRepository.js";
 import { EntregasService } from "../services/EntregasService.js";
 import { MotoristasService } from "../services/MotoristasService.js";
 import { PainelEntregasController } from "../controllers/painel/EntregasController.js";
 import { PainelMotoristasController } from "../controllers/painel/MotoristasController.js";
+import { PainelRelatoriosController } from "../controllers/painel/RelatoriosController.js";
 
 export function createPainelRouter() {
   const router = express.Router();
 
   const entregasRepo = new EntregasPrismaRepository(prisma);
   const motoristasRepo = new MotoristasPrismaRepository(prisma);
+  const relatoriosRepo = new RelatoriosPrismaRepository(prisma);
 
   const entregasService = new EntregasService(entregasRepo, motoristasRepo);
   const motoristasService = new MotoristasService(motoristasRepo);
 
   const entregasController = new PainelEntregasController(entregasService, motoristasService);
   const motoristasController = new PainelMotoristasController(motoristasService);
+  const relatoriosController = new PainelRelatoriosController(relatoriosRepo);
 
   router.get("/entregas", entregasController.listarEntregas);
   router.get("/entregas/nova", entregasController.exibirNovaEntrega);
@@ -33,6 +37,10 @@ export function createPainelRouter() {
   router.get("/motoristas", motoristasController.listarMotoristas);
   router.get("/motoristas/novo", motoristasController.exibirNovoMotorista);
   router.post("/motoristas", motoristasController.criarMotorista);
+  router.post("/motoristas/:id/ativar", motoristasController.ativarMotorista);
+  router.post("/motoristas/:id/inativar", motoristasController.inativarMotorista);
+
+  router.get("/relatorios", relatoriosController.exibirRelatorios);
 
   return router;
 }

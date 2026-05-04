@@ -89,4 +89,26 @@ export class PainelMotoristasController {
       return next(err);
     }
   };
+
+  ativarMotorista = async (req, res, next) => {
+    try {
+      await this.motoristasService.atualizarStatus(req.params.id, "ATIVO");
+      return res.redirect(
+        `/painel/motoristas?sucesso=${encodeURIComponent("Motorista ativado com sucesso")}`
+      );
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  inativarMotorista = async (req, res, next) => {
+    try {
+      await this.motoristasService.atualizarStatus(req.params.id, "INATIVO");
+      return res.redirect(
+        `/painel/motoristas?sucesso=${encodeURIComponent("Motorista inativado com sucesso")}`
+      );
+    } catch (err) {
+      return next(err);
+    }
+  };
 }

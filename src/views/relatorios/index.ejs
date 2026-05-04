@@ -1,0 +1,54 @@
+<div class="page-title">
+  <h1>Relatorios</h1>
+</div>
+
+<div class="card">
+  <h2>Entregas por status</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% const statusEntries = Object.entries(entregasPorStatus || {}); %>
+      <% if (!statusEntries.length) { %>
+        <tr>
+          <td colspan="2">Nenhuma entrega encontrada.</td>
+        </tr>
+      <% } else { %>
+        <% statusEntries.forEach(([status, total]) => { %>
+          <tr>
+            <td><span class="badge badge--<%= status %>"><%= status %></span></td>
+            <td><%= total %></td>
+          </tr>
+        <% }); %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Motoristas ativos com entregas em aberto</h2>
+  <% if (!motoristasAtivos.length) { %>
+    <p>Nenhum motorista ativo com entregas em aberto.</p>
+  <% } else { %>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Motorista</th>
+          <th>Entregas em aberto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% motoristasAtivos.forEach((item) => { %>
+          <tr>
+            <td><%= item.nome %></td>
+            <td><%= item.entregasEmAberto %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</div>
