@@ -23,8 +23,12 @@ export function createPainelRouter() {
   router.get("/entregas/nova", entregasController.exibirNovaEntrega);
   router.post("/entregas", entregasController.criarEntrega);
   router.get("/entregas/:id", entregasController.detalharEntrega);
+  router.patch("/entregas/:id/atribuir", entregasController.atribuirMotorista);
   router.patch("/entregas/:id/avancar", entregasController.avancarEntrega);
   router.patch("/entregas/:id/cancelar", entregasController.cancelarEntrega);
+  router.post("/entregas/:id/atribuir", entregasController.atribuirMotorista);
+  router.post("/entregas/:id/avancar", entregasController.avancarEntrega);
+  router.post("/entregas/:id/cancelar", entregasController.cancelarEntrega);
 
   router.get("/motoristas", motoristasController.listarMotoristas);
   router.get("/motoristas/novo", motoristasController.exibirNovoMotorista);

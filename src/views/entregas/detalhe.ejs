@@ -1,6 +1,6 @@
 <div class="page-title">
   <h1>Entrega #<%= entrega.id %></h1>
-  <a class="button button--ghost" href="/painel/entregas">Voltar</a>
+  <a class="button  button--ghost--back" href="/painel/entregas">Voltar</a>
 </div>
 
 <div class="card">
@@ -9,6 +9,26 @@
   <p><strong>Destino:</strong> <%= entrega.destino %></p>
   <p><strong>Status:</strong> <span class="badge badge--<%= entrega.status %>"><%= entrega.status %></span></p>
   <p><strong>Motorista:</strong> <%= motorista ? motorista.nome : "Sem motorista" %></p>
+
+  <div class="actions" style="margin-top:16px;">
+    <form method="POST" action="/painel/entregas/<%= entrega.id %>/atribuir" class="form-grid" style="align-items:end;">
+      <input type="hidden" name="_method" value="PATCH" />
+      <div class="field">
+        <label for="motoristaId">Vincular motorista</label>
+        <select id="motoristaId" name="motoristaId" required>
+          <option value="">Selecione</option>
+          <% motoristas.forEach((item) => { %>
+            <option value="<%= item.id %>" <%= entrega.motoristaId === item.id ? "selected" : "" %>>
+              <%= item.nome %> - <%= item.placaVeiculo %> (<%= item.status %>)
+            </option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="field">
+        <button class="button" type="submit">Vincular motorista</button>
+      </div>
+    </form>
+  </div>
 
   <div class="actions" style="margin-top:16px;">
     <form method="POST" action="/painel/entregas/<%= entrega.id %>/avancar">

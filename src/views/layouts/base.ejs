@@ -1,253 +1,266 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><%= pageTitle ? `${pageTitle} | Painel` : "Painel" %></title>
-    <style>
-      :root {
-        color-scheme: light;
-        --bg: #f7f4ef;
-        --surface: #ffffff;
-        --ink: #1b1f24;
-        --muted: #5b6572;
-        --brand: #0b6b5d;
-        --brand-soft: #e4f3f1;
-        --warn: #d97706;
-        --danger: #b91c1c;
-        --success: #15803d;
-        --shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
-        --radius: 14px;
-      }
 
-      * {
-        box-sizing: border-box;
-      }
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>
+    <%= pageTitle ? `${pageTitle} | Painel` : "Painel" %>
+  </title>
+  <style>
+    :root {
+      color-scheme: light;
+      /* --bg: #0f172a;*/
+      --bg: #f7f4ef;
+      --surface: #ffffff;
+      --ink: #1b1f24;
+      --muted: #5b6572;
+      --brand: #0b6b5d;
+      --brand-soft: #e4f3f1;
+      --warn: #d97706;
+      --danger: #b91c1c;
+      --success: #15803d;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+      --radius: 14px;
+    }
 
-      body {
-        margin: 0;
-        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
-        background: radial-gradient(circle at top left, #fff2d8, #f7f4ef 45%, #eef2f3 100%);
-        color: var(--ink);
-      }
+    * {
+      box-sizing: border-box;
+    }
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
+    body {
+      margin: 0;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      background-image: linear-gradient(to right top, #0d1726, #032434, #00323d, #003f40, #134c3d);
+      color: var(--ink);
+    }
 
-      .app {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-      header {
-        background: var(--surface);
-        box-shadow: var(--shadow);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-      }
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
+    header {
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    main {
+      flex: 1;
+      padding: 32px 24px 48px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    footer {
+      padding: 18px 24px;
+      text-align: center;
+      color: var(--bg);
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      color: #fff;
+      font-size: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      background: var(--brand);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .button--ghost {
+      background: transparent;
+      border: 1px solid var(--brand);
+      color: var(--brand);
+    }
+
+    .button--ghost--back {
+      background: transparent;
+      border: 1px solid var(--bg);
+      color: var(--bg);
+    }
+
+    .button--danger {
+      background: var(--danger);
+    }
+
+    .button--warn {
+      background: var(--warn);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid #e9eef1;
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge--CRIADA {
+      background: var(--brand-soft);
+      color: var(--brand);
+    }
+
+    .badge--EM_TRANSITO {
+      background: #fef3c7;
+      color: var(--warn);
+    }
+
+    .badge--ENTREGUE {
+      background: #dcfce7;
+      color: var(--success);
+    }
+
+    .badge--CANCELADA {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .flash {
+      padding: 14px 18px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .flash--success {
+      background: #dcfce7;
+      color: #14532d;
+    }
+
+    .flash--error {
+      background: #fee2e2;
+      color: #7f1d1d;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-weight: 600;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d7dde2;
+      font-family: inherit;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .pagination a {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #d7dde2;
+      color: var(--muted);
+    }
+
+    .pagination .active {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    @media (max-width: 700px) {
       main {
-        flex: 1;
-        padding: 32px 24px 48px;
-        max-width: 1100px;
-        width: 100%;
-        margin: 0 auto;
-      }
-
-      footer {
-        padding: 18px 24px;
-        text-align: center;
-        color: var(--muted);
-      }
-
-      .card {
-        background: var(--surface);
-        border-radius: var(--radius);
-        padding: 24px;
-        box-shadow: var(--shadow);
-        margin-bottom: 24px;
+        padding: 24px 16px 40px;
       }
 
       .page-title {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 20px;
-      }
-
-      .page-title h1 {
-        margin: 0;
-        font-size: 28px;
-      }
-
-      .button {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border: none;
-        padding: 10px 16px;
-        border-radius: 999px;
-        font-weight: 600;
-        background: var(--brand);
-        color: #fff;
-        cursor: pointer;
-      }
-
-      .button--ghost {
-        background: transparent;
-        border: 1px solid var(--brand);
-        color: var(--brand);
-      }
-
-      .button--danger {
-        background: var(--danger);
-      }
-
-      .button--warn {
-        background: var(--warn);
-      }
-
-      .table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      .table th,
-      .table td {
-        text-align: left;
-        padding: 12px 10px;
-        border-bottom: 1px solid #e9eef1;
-        font-size: 14px;
-      }
-
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-      }
-
-      .badge--CRIADA {
-        background: var(--brand-soft);
-        color: var(--brand);
-      }
-
-      .badge--EM_TRANSITO {
-        background: #fef3c7;
-        color: var(--warn);
-      }
-
-      .badge--ENTREGUE {
-        background: #dcfce7;
-        color: var(--success);
-      }
-
-      .badge--CANCELADA {
-        background: #fee2e2;
-        color: var(--danger);
-      }
-
-      .flash {
-        padding: 14px 18px;
-        border-radius: 12px;
-        margin-bottom: 16px;
-        font-weight: 600;
-      }
-
-      .flash--success {
-        background: #dcfce7;
-        color: #14532d;
-      }
-
-      .flash--error {
-        background: #fee2e2;
-        color: #7f1d1d;
-      }
-
-      .form-grid {
-        display: grid;
-        gap: 16px;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      }
-
-      .field {
-        display: flex;
         flex-direction: column;
-        gap: 6px;
+        align-items: flex-start;
       }
+    }
+  </style>
+</head>
 
-      .field label {
-        font-weight: 600;
-      }
-
-      .field input,
-      .field select,
-      .field textarea {
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid #d7dde2;
-        font-family: inherit;
-      }
-
-      .actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .pagination {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 18px;
-      }
-
-      .pagination a {
-        padding: 6px 12px;
-        border-radius: 8px;
-        border: 1px solid #d7dde2;
-        color: var(--muted);
-      }
-
-      .pagination .active {
-        background: var(--brand);
-        color: #fff;
-        border-color: var(--brand);
-      }
-
-      @media (max-width: 700px) {
-        main {
-          padding: 24px 16px 40px;
-        }
-
-        .page-title {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="app">
-      <header>
-        <%- include("../partials/nav", { currentPath }) %>
-      </header>
-      <main>
-        <%- include("../partials/flash", { flash }) %>
+<body>
+  <div class="app">
+    <header>
+      <%- include("../partials/nav", { currentPath }) %>
+    </header>
+    <main>
+      <%- include("../partials/flash", { flash }) %>
         <%- body %>
-      </main>
-      <footer>
-        Painel interno de operacoes
-      </footer>
-    </div>
-  </body>
+    </main>
+    <footer>
+      Painel interno de operacoes
+    </footer>
+  </div>
+</body>
+
 </html>

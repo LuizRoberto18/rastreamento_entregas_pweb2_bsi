@@ -122,7 +122,10 @@ export class PainelEntregasController {
 
   detalharEntrega = async (req, res, next) => {
     try {
-      const entrega = await this.entregasService.buscarPorId(req.params.id);
+      const [entrega, motoristas] = await Promise.all([
+        this.entregasService.buscarPorId(req.params.id),
+        this.motoristasService.listarMotoristas()
+      ]);
       const flash = buildFlash(req.query);
 
       let motorista = null;
@@ -135,6 +138,7 @@ export class PainelEntregasController {
       }
 
       const historico = Array.isArray(entrega.historico) ? entrega.historico : [];
+      const motoristasAtivos = motoristas.filter((item) => item.status === "ATIVO");
 
       return renderWithLayout(res, next, "entregas/detalhe", {
         pageTitle: "Detalhe da entrega",
@@ -142,10 +146,28 @@ export class PainelEntregasController {
         flash,
         entrega,
         motorista,
-        historico
+        historico,
+        motoristas: motoristasAtivos
       });
     } catch (err) {
       next(err);
+    }
+  };
+
+  atribuirMotorista = async (req, res, next) => {
+    try {
+      const { motoristaId } = req.body;
+
+      await this.entregasService.atribuirMotorista(req.params.id, motoristaId);
+      return res.redirect(
+        `/painel/entregas/${req.params.id}?sucesso=${encodeURIComponent("Motorista atribuido com sucesso")}`
+      );
+    } catch (err) {
+      if (err instanceof AppError) {
+        return res.redirect(`/painel/entregas/${req.params.id}?erro=${encodeURIComponent(err.message)}`);
+      }
+
+      return next(err);
     }
   };
 
