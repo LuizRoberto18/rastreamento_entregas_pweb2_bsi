@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | Rastreamento de Entregas</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: inherit;
+      background-image: linear-gradient(to right top, #0d1726, #032434, #00323d, #003f40, #134c3d);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1b1f24;
+    }
+    .login-container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+      width: 100%;
+      max-width: 400px;
+    }
+    .field {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-weight: 600;
+    }
+    .field input {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d7dde2;
+    }
+    .button {
+      background: #0b6b5d;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 999px;
+      width: 100%;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #error-msg {
+      color: #b91c1c;
+      margin-bottom: 12px;
+      display: none;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <div id="error-msg"></div>
+    <form id="login-form">
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" required />
+      </div>
+      <button type="submit" class="button">Entrar</button>
+      <div style="text-align: center; margin-top: 15px;">
+        <span>Ainda não tem conta? <a href="/registrar" style="color: #0b6b5d; font-weight: 600; text-decoration: none;">Cadastre-se</a></span>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Limpa token anterior
+    localStorage.removeItem('token');
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      const errorMsg = document.getElementById('error-msg');
+      
+      try {
+        errorMsg.style.display = 'none';
+        const response = await axios.post('/api/auth/login', { email, senha });
+        const token = response.data.accessToken;
+        if (token) {
+          localStorage.setItem('token', token);
+          window.location.href = '/painel/entregas';
+        }
+      } catch (error) {
+        errorMsg.textContent = error.response?.data?.erro || 'Erro ao fazer login';
+        errorMsg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

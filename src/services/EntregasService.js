@@ -22,19 +22,12 @@ export class EntregasService {
     this.motoristasRepository = motoristasRepository;
   }
 
-  async criarEntrega({ descricao, origem, destino }) {
+  async criarEntrega({ descricao, origem, destino, criadorId }) {
     if (origem === destino) {
       throw new AppError("Origem e destino não podem ser iguais", 400);
     }
 
-    const entregas = await this.entregasRepository.listarTodos();
-
-    const duplicada = entregas.find(e =>
-      e.descricao === descricao &&
-      e.origem === origem &&
-      e.destino === destino &&
-      ![STATUS.ENTREGUE, STATUS.CANCELADA].includes(e.status)
-    );
+    const duplicada = await this.entregasRepository.buscarEntregaAtiva({ descricao, origem, destino });
 
     if (duplicada) {
       throw new AppError("Entrega duplicada ativa", 400);
@@ -46,6 +39,7 @@ export class EntregasService {
       destino,
       status: STATUS.CRIADA,
       motoristaId: null,
+      criadorId,
       historico: [
         {
           data: new Date().toISOString(),
@@ -166,4 +160,11 @@ export class EntregasService {
 
     return this.entregasRepository.atualizar(entrega.id, entrega);
   }
+
+  async contarEntregas(filtros) {
+  if (typeof filtros === "string") {
+    return this.entregasRepository.contar({ status: filtros });
+  }
+  return this.entregasRepository.contar(filtros || {});
+}
 }

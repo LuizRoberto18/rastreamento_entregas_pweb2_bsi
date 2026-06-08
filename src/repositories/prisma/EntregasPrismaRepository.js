@@ -11,6 +11,7 @@ export class EntregasPrismaRepository {
       destino: entrega.destino,
       status: entrega.status,
       motoristaId: entrega.motoristaId,
+      criadorId: entrega.criadorId,
       historico: (entrega.eventos || []).map((evento) => ({
         data: evento.dataEvento.toISOString(),
         descricao: evento.descricao
@@ -62,9 +63,9 @@ export class EntregasPrismaRepository {
       },
       ...(page && limit
         ? {
-            skip: (page - 1) * limit,
-            take: limit
-          }
+          skip: (page - 1) * limit,
+          take: limit
+        }
         : {})
     });
 
@@ -90,6 +91,26 @@ export class EntregasPrismaRepository {
     return this.mapEntrega(entrega);
   }
 
+  async buscarEntregaAtiva({ descricao, origem, destino }) {
+    const entrega = await this.prisma.entrega.findFirst({
+      where: {
+        descricao,
+        origem,
+        destino,
+        status: {
+          notIn: ["ENTREGUE", "CANCELADA"]
+        }
+      },
+      include: {
+        eventos: {
+          orderBy: { dataEvento: "asc" }
+        }
+      }
+    });
+
+    return entrega ? this.mapEntrega(entrega) : null;
+  }
+
   async criar(dados) {
     const entrega = await this.prisma.entrega.create({
       data: {
@@ -98,6 +119,7 @@ export class EntregasPrismaRepository {
         destino: dados.destino,
         status: dados.status,
         motoristaId: dados.motoristaId ?? null,
+        criadorId: dados.criadorId ?? null,
         eventos: {
           create: (dados.historico || []).map((evento) => ({
             dataEvento: new Date(evento.data),
@@ -140,6 +162,7 @@ export class EntregasPrismaRepository {
           destino: dadosAtualizados.destino,
           status: dadosAtualizados.status,
           motoristaId: dadosAtualizados.motoristaId ?? null,
+          criadorId: dadosAtualizados.criadorId ?? null,
           eventos: {
             create: (dadosAtualizados.historico || []).map((evento) => ({
               dataEvento: new Date(evento.data),
@@ -158,5 +181,10 @@ export class EntregasPrismaRepository {
     });
 
     return this.mapEntrega(entrega);
+  }
+  async contar(filtros = {}) {
+    return this.prisma.entrega.count({
+      where: this.buildWhere(filtros)
+    });
   }
 }

@@ -26,9 +26,12 @@
   "homepage": "https://github.com/LuizRoberto18/rastreamento_entregas_pweb2_bsi#readme",
   "dependencies": {
     "@prisma/client": "^6.18.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "ejs": "^3.1.10",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "method-override": "^3.0.0",
     "prisma": "^6.18.0"
   },

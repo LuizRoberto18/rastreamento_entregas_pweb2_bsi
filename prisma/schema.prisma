@@ -14,6 +14,25 @@ enum EntregaStatus {
   CANCELADA
 }
 
+enum UserRole {
+  ADMIN
+  GESTOR
+  OPERADOR
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  senhaHash String   @map("senha_hash")
+  papel     UserRole @default(OPERADOR)
+  entregasCriadas Entrega[]
+  createdAt DateTime @default(now()) @map("criado_em")
+  updatedAt DateTime @updatedAt @map("atualizado_em")
+
+  @@map("usuarios")
+}
+
 enum MotoristaStatus {
   ATIVO
   INATIVO
@@ -27,12 +46,15 @@ model Entrega {
   status     EntregaStatus
   motoristaId Int?          @map("motorista_id")
   motorista  Motorista?     @relation(fields: [motoristaId], references: [id], onDelete: SetNull)
+  criadorId  Int?           @map("criador_id")
+  criador    Usuario?       @relation(fields: [criadorId], references: [id], onDelete: SetNull)
   eventos    EventoEntrega[]
   createdAt  DateTime       @default(now()) @map("criado_em")
   updatedAt  DateTime       @updatedAt @map("atualizado_em")
 
   @@index([status])
   @@index([motoristaId])
+  @@index([criadorId])
   @@map("entregas")
 }
 
