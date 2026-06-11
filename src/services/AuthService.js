@@ -17,7 +17,7 @@ export class AuthService {
       throw new AppError("Email já cadastrado", 409); // Cenário de e-mail duplicado
     }
 
-    // Criptografia em conformidade regulatória (custo estipulado de 10)
+    // Criptografia
     const senhaHash = await bcrypt.hash(senha, 10);
 
     const usuario = await this.usuariosRepository.criar({
@@ -46,7 +46,6 @@ export class AuthService {
       throw new AppError("Credenciais inválidas", 401);
     }
 
-    // Comparação assíncrona obrigatória com await
     const senhaValida = await bcrypt.compare(senha, usuario.senhaHash);
     if (!senhaValida) {
       throw new AppError("Credenciais inválidas", 401);

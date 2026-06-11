@@ -5,11 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "docs:jsdoc": "jsdoc -c jsdoc.json",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
-    "prisma:seed": "node prisma/seed.js"
+    "prisma:seed": "node prisma/seed.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test:e2e": "playwright test"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -28,7 +31,6 @@
     "@prisma/client": "^6.18.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
-    "dotenv": "^17.4.2",
     "ejs": "^3.1.10",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
@@ -36,6 +38,9 @@
     "prisma": "^6.18.0"
   },
   "devDependencies": {
-    "jsdoc": "^3.6.11"
+    "dotenv": "^17.4.2",
+    "jest": "^30.4.2",
+    "jsdoc": "^3.6.11",
+    "supertest": "^7.2.2"
   }
 }

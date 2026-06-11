@@ -17,7 +17,7 @@ export function autenticar(req, res, next) {
 
   // Se nenhum token for encontrado
   if (!token) {
-    // Se o usuário tentar acessar o painel web, redirecione para o Login em vez de um JSON
+    // Se o usuário tentar acessar o painel web, redirecione para o Login 
     if (req.originalUrl.startsWith("/painel")) {
       return res.redirect("/auth/login");
     }
