@@ -4,11 +4,14 @@ import { autorizar } from "../middlewares/autorizar.js";
 export function createMotoristasRouter(motoristasController) {
   const router = express.Router();
 
+  // RF-03: Criação restrita a Gestores
   router.post("/", autorizar("GESTOR"), motoristasController.criarMotorista);
+  
   router.get("/", motoristasController.listarMotoristas);
   router.get("/:id", motoristasController.obterMotoristaPorId);
   router.get("/:id/entregas", motoristasController.listarEntregasPorMotorista);
   
+  // RF-03: Edição restrita a Gestores
   if (motoristasController.atualizarMotorista) {
     router.patch("/:id", autorizar("GESTOR"), motoristasController.atualizarMotorista);
   } else {

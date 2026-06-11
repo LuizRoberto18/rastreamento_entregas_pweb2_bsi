@@ -4,10 +4,11 @@ export function autorizar(...papeis) {
       return res.status(401).json({ erro: "Usuário não autenticado" });
     }
 
+    // validação estrita em memória usando o req.usuario injetado
     if (!papeis.includes(req.usuario.papel)) {
       return res.status(403).json({ erro: "Acesso negado" });
     }
 
-    next();
+    return next();
   };
 }

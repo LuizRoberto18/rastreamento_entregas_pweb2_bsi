@@ -1,11 +1,13 @@
 import "dotenv/config"; 
 
 import express from "express";
+import cookieParser from "cookie-parser";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import methodOverride from "method-override";
 import { createApiRouter } from "./routes/index.js";
 import { createPainelRouter } from "./routes/PainelRoutes.js";
+import { autenticar } from "./middlewares/autenticar.js";
 import { AppError } from "./utils/AppError.js";
 
 
@@ -24,11 +26,12 @@ app.use(express.static(path.join(__dirname, "public")));
 // Middleware global
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(methodOverride("_method"));
 
 // Rotas principais
 app.use("/api", createApiRouter());
-app.use("/painel", createPainelRouter());
+app.use("/painel",autenticar, createPainelRouter());
 
 // Rota de login (Frontend)
 app.get("/login", (req, res) => {

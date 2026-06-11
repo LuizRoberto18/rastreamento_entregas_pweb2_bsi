@@ -14,10 +14,10 @@ export class AuthService {
 
     const existente = await this.usuariosRepository.buscarPorEmail(email);
     if (existente) {
-      throw new AppError("Email já cadastrado", 409);
+      throw new AppError("Email já cadastrado", 409); // Cenário de e-mail duplicado
     }
 
-    // Custo mínimo regulamentado de 10
+    // Criptografia em conformidade regulatória (custo estipulado de 10)
     const senhaHash = await bcrypt.hash(senha, 10);
 
     const usuario = await this.usuariosRepository.criar({
@@ -27,7 +27,13 @@ export class AuthService {
       papel
     });
 
-    return { id: usuario.id, nome: usuario.nome, email: usuario.email, papel: usuario.papel };
+    // Retorna exclusivamente dados não sensíveis
+    return { 
+      id: usuario.id, 
+      nome: usuario.nome, 
+      email: usuario.email, 
+      papel: usuario.papel 
+    };
   }
 
   async login({ email, senha }) {
@@ -40,6 +46,7 @@ export class AuthService {
       throw new AppError("Credenciais inválidas", 401);
     }
 
+    // Comparação assíncrona obrigatória com await
     const senhaValida = await bcrypt.compare(senha, usuario.senhaHash);
     if (!senhaValida) {
       throw new AppError("Credenciais inválidas", 401);
@@ -52,6 +59,7 @@ export class AuthService {
       papel: usuario.papel
     };
 
+    // Assinatura do token configurável via ambiente externo
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || "8h"
     });
