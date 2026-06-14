@@ -1,10 +1,28 @@
 export default {
-    transform: {}, // Necessário se não estiver usando Babel para ESM puro
+    transform: {}, 
     testEnvironment: "node",
     verbose: true,
     setupFiles: ["<rootDir>/tests/setup.env.js"],
     setupFilesAfterEnv: ["<rootDir>/tests/setup.js"],
     coverageDirectory: "coverage",
+    testMatch: [
+        "**/tests/unit/**/*.test.js",
+        "**/tests/integration/**/*.test.js"
+    ],
+    coveragePathIgnorePatterns: [
+        "/node_modules/",
+        "/tests/"
+    ],
+    testPathIgnorePatterns: [
+        "/node_modules/",
+        "/frontend/",
+        "/src/frontend/"
+    ],
+    testPathIgnorePatterns: [
+        "/node_modules/",
+        "/tests/e2e/",               
+        "/tests/playwright.config.js"
+    ],
     collectCoverageFrom: [
         "src/services/**/*.js",
         "src/middlewares/**/*.js",
@@ -27,4 +45,5 @@ export default {
             statements: 75
         }
     }
+
 };

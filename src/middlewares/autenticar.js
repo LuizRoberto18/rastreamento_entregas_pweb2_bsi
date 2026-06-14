@@ -19,7 +19,7 @@ export function autenticar(req, res, next) {
   if (!token) {
     // Se o usuário tentar acessar o painel web, redirecione para o Login 
     if (req.originalUrl.startsWith("/painel")) {
-      return res.redirect("/auth/login");
+      return res.redirect("/login");
     }
     return res.status(401).json({ erro: "Token não fornecido" });
   }

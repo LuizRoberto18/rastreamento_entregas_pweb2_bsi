@@ -12,7 +12,7 @@ export class AuthController {
       const usuario = await this.authService.registrar({ nome, email, senha, papel });
       const isFormSubmit = req.headers["content-type"]?.includes("application/x-www-form-urlencoded");
       if (isFormSubmit) {
-        return res.redirect("/auth/login?sucesso=cadastrado");
+        return res.redirect("/login?sucesso=cadastrado");
       }
 
       return res.status(201).json(usuario);
