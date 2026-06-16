@@ -58,16 +58,16 @@
   <div class="login-container">
     <h2>Login</h2>
     <div id="error-msg" data-testid="alerta-erro"></div>
-    <form id="login-form" data-testid="input-email" data-testid="input-senha" data-testid="btn-login">
+    <form id="login-form" >
       <div class="field">
         <label for="email">E-mail</label>
-        <input type="email" id="email" required />
+        <input type="email" id="email" required  data-testid="input-email"/>
       </div>
       <div class="field">
         <label for="senha">Senha</label>
-        <input type="password" id="senha" required />
+        <input type="password" id="senha" required  data-testid="input-senha"/>
       </div>
-      <button type="submit" class="button">Entrar</button>
+      <button type="submit" class="button" data-testid="btn-login">Entrar</button>
       <div style="text-align: center; margin-top: 15px;">
         <span>Ainda não tem conta? <a href="/registrar" style="color: #0b6b5d; font-weight: 600; text-decoration: none;">Cadastre-se</a></span>
       </div>

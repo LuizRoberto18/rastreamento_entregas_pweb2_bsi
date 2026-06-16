@@ -1,15 +1,7 @@
-import "dotenv/config";
+import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
-import path from "node:path";
 
-const sqliteUrl = `file:${path.resolve(process.cwd(), "prisma", "dev.db").replace(/\\/g, "/")}`;
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: sqliteUrl
-    }
-  }
-});
+const prisma = new PrismaClient();
 
 function diasAtras(dias) {
   const d = new Date();
@@ -21,7 +13,18 @@ async function main() {
   await prisma.eventoEntrega.deleteMany();
   await prisma.entrega.deleteMany();
   await prisma.motorista.deleteMany();
+  await prisma.usuario.deleteMany();
 
+  const senhaCriptografada = await bcrypt.hash("senha_ficticio", 10); 
+
+  await prisma.usuario.create({
+    data: {
+      nome: "Gestor de Testes",
+      email: "gestor@teste.com",
+      senhaHash: senhaCriptografada,
+      papel: "GESTOR" 
+    }
+  });
   const motoristas = await prisma.$transaction([
     prisma.motorista.create({
       data: {

@@ -183,13 +183,13 @@ describe("Entregas Security Routes (Integration)", () => {
     });
 
 
-    test("Deve limpar cookie e redirecionar para /auth/login se acessar o painel com token inválido", async () => {
+    test("Deve limpar cookie e redirecionar para /login se acessar o painel com token inválido", async () => {
         const response = await request(app)
             .get("/painel/test-cobertura-token-invalido")
             .set("Cookie", ["token=token_expirado_ou_invalido"]);
 
         expect(response.status).toBe(302);
-        expect(response.headers.location).toBe("/auth/login");
+        expect(response.headers.location).toBe("/login");
     });
 
     test("Deve retornar 401 se o middleware autorizar for chamado sem req.usuario", () => {

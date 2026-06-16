@@ -1,4 +1,4 @@
-import "dotenv/config"; 
+import "dotenv/config";
 
 import express from "express";
 import cookieParser from "cookie-parser";
@@ -31,7 +31,7 @@ app.use(methodOverride("_method"));
 
 // Rotas principais
 app.use("/api", createApiRouter());
-app.use("/painel",autenticar, createPainelRouter());
+app.use("/painel", autenticar, createPainelRouter());
 
 // Rota de login (Frontend)
 app.get("/login", (req, res) => {
@@ -41,6 +41,12 @@ app.get("/login", (req, res) => {
 // Rota de cadastro (Frontend)
 app.get("/registrar", (req, res) => {
     res.render("auth/registrar", { pageTitle: "Cadastro" });
+});
+
+
+// Redireciona o atalho /entregas para dentro do /painel/entregas
+app.get("/entregas", (req, res) => {
+    res.redirect("/painel/entregas");
 });
 
 // Rota de health check 

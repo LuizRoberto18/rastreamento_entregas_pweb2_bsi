@@ -37,6 +37,13 @@
 })();
 
 function logout() {
-  localStorage.removeItem('token');
-  window.location.href = '/login';
+  // 1. Limpa o cookie de token definindo uma data passada
+  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  
+  // 2. Se você usa LocalStorage por garantia, limpe também
+  localStorage.removeItem("token");
+  sessionStorage.removeItem("token");
+
+  // 3. O PASSO CRUCIAL: Redireciona fisicamente a página para o login
+  window.location.href = "/login";
 }

@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './e2e',           // Aponta para a pasta correta (pois o config já está dentro de tests/)
+  testDir: '../e2e',           // Aponta para a pasta correta (pois o config já está dentro de tests/)
   testMatch: '**/*.spec.js',  // Garante que só leia os specs
   fullyParallel: false,
   reporter: 'html',
@@ -16,9 +16,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev', // Comando para iniciar o servidor
+    // Executa diretamente o arquivo do seu servidor Express
+    command: 'node src/server.js', 
     url: 'http://localhost:3000',
+    cwd: '../../',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  }
+  },
 });

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 export function autenticar(req, res, next) {
   let token = null;
 
-  // Busca prioritária
+  // Busca prioritária nos cookies
   if (req.cookies && req.cookies.token) {
     token = req.cookies.token;
   } 
@@ -15,10 +15,12 @@ export function autenticar(req, res, next) {
     }
   }
 
+  // --- ALTERAÇÃO AQUI: Lista de rotas que devem redirecionar para a tela de login se não houver token ---
+  const ehRotaWeb = req.originalUrl.startsWith("/painel") || req.originalUrl.startsWith("/entregas");
+
   // Se nenhum token for encontrado
   if (!token) {
-    // Se o usuário tentar acessar o painel web, redirecione para o Login 
-    if (req.originalUrl.startsWith("/painel")) {
+    if (ehRotaWeb) {
       return res.redirect("/login");
     }
     return res.status(401).json({ erro: "Token não fornecido" });
@@ -36,10 +38,10 @@ export function autenticar(req, res, next) {
 
     return next();
   } catch (err) {
-    // Se o token for inválido/expirado e ele estiver navegando no painel, limpa o cookie e joga pro login
-    if (req.originalUrl.startsWith("/painel")) {
+    // Se o token for inválido/expirado e ele estiver navegando nas telas web
+    if (ehRotaWeb) {
       res.clearCookie("token");
-      return res.redirect("/auth/login");
+      return res.redirect("/login"); // Mantido /login para corresponder ao que o Playwright espera
     }
     return res.status(401).json({ erro: "Token inválido ou expirado" });
   }
