@@ -44,7 +44,7 @@ if exist test.db del /f /q test.db
 call npx -p dotenv-cli dotenv -e .env.test -- npx prisma db push
 
 echo.
-echo [+] 4. Semeando dados iniciais (Seed)...
+echo [+] 4. Inserindo dados iniciais (Seed)...
 call npx prisma db seed
 
 echo.
