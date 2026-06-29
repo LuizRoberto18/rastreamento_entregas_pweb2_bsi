@@ -1,0 +1,12 @@
+node_modules
+coverage
+playwright-report
+test-results
+docs
+.git
+.gitignore
+.env
+.env.test
+*.log
+prisma/dev.db
+test.db

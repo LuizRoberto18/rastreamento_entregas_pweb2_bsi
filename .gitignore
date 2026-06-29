@@ -3,5 +3,11 @@ data/
 .env
 prisma/dev.db
 dev.db
-
 /src/generated/prisma
+coverage/
+playwright-report/
+test-results/
+data/
+.env
+.env.test
+*.db

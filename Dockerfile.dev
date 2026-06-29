@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/playwright:v1.60.0-jammy
+
+WORKDIR /app
+
+# Copia apenas os arquivos de gerenciamento de dependências primeiro (otimiza o cache do Docker)
+COPY package*.json ./
+
+# Instala as dependências isoladas dentro do container Linux
+RUN npm ci
+
+# Copia o restante dos arquivos do projeto
+COPY . .
+
+#Remove caracteres ocultos do Windows (\r) do script e dá permissão de execução
+RUN sed -i 's/\r$//' setup.sh && chmod +x setup.sh
+
+# Executa o seu script de inicialização e testes automaticamente ao subir o container
+CMD ["./setup.sh"]

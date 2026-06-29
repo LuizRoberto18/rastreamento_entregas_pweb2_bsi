@@ -15,7 +15,7 @@ export function autenticar(req, res, next) {
     }
   }
 
-  // --- ALTERAÇÃO AQUI: Lista de rotas que devem redirecionar para a tela de login se não houver token ---
+  // --- Lista de rotas que devem redirecionar para a tela de login se não houver token ---
   const ehRotaWeb = req.originalUrl.startsWith("/painel") || req.originalUrl.startsWith("/entregas");
 
   // Se nenhum token for encontrado
